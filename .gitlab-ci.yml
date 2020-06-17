@@ -1,7 +1,18 @@
-image: "rust:latest"
+stages:
+  - build
 
-# Use cargo to test the project
-test:cargo:
+rust-latest:
+  stage: build
+  image: rust:latest
   script:
-    - rustc --version && cargo --version  # Print version info for debugging
-    - cargo test --workspace --verbose
+    - cargo build --verbose
+    - cargo test --verbose
+
+rust-nightly:
+  stage: build
+  image: rustlang/rust:nightly
+  script:
+    - cargo build --verbose
+    - cargo test --verbose
+  allow_failure: true
+
