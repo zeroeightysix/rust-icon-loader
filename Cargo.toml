@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Malte Veerman <malte.veerman@gmail.com>"]
 license = "MIT"
 edition = "2018"
+description = "Crate to load and cache themed icons in 100% safe rust."
 repository = "https://gitlab.com/Maldela/rust-icon-loader"
 
 [features]
