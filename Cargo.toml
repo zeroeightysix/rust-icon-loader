@@ -1,0 +1,22 @@
+[package]
+name = "icon-loader"
+version = "0.1.0"
+authors = ["Malte Veerman <malte.veerman@gmail.com>"]
+license = "MIT"
+edition = "2018"
+
+[features]
+default = ["kde", "gtk"]
+
+# Adds the ability to read the default theme name from '~/.config/kdeglobals'.
+kde = []
+
+# Adds the ability to read the default theme name from '~/.config/gtk-3.0/settings.ini'.
+gtk = []
+
+# Makes the icon loader `Send` and `Sync`.
+sync = []
+
+[dependencies]
+xdg = "2.2"
+rust-ini = "0.15"
