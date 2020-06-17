@@ -11,10 +11,11 @@
 //!
 //! let mut loader = IconLoader::new();
 //! loader.set_theme_name_provider(ThemeNameProvider::KDE);
-//! loader.update_theme_name().unwrap();
+//! loader.update_theme_name();
 //!
-//! let icon = loader.load_icon("audio-headphones").unwrap();
-//! let path = icon.file_for_size(64).path();
+//! if let Ok(icon) = loader.load_icon("audio-headphones") {
+//!     let path = icon.file_for_size(64).path();
+//! }
 //! ```
 //!
 //! * Loading icons from a custom theme in a provided folder:
@@ -24,10 +25,11 @@
 //! let mut loader = IconLoader::new();
 //! loader.set_search_paths(&["path_to_your_icon_theme"]);
 //! loader.set_theme_name_provider("name_of_your_icon_theme");
-//! loader.update_theme_name().unwrap();
+//! loader.update_theme_name();
 //!
-//! let icon = loader.load_icon("icon_name").unwrap();
-//! let path = icon.file_for_size(32).path();
+//! if let Ok(icon) = loader.load_icon("icon_name") {
+//!     let path = icon.file_for_size(32).path();
+//! }
 //! ```
 //!
 //! [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
@@ -317,8 +319,9 @@ impl Icon {
     /// use icon_loader::{IconLoader, IconType};
     ///
     /// let loader = IconLoader::new();
-    /// let icon = loader.load_icon("minimum").unwrap();
-    /// let icon_file = icon.file_for_size(32);
+    /// if let Ok(icon) = loader.load_icon("minimum") {
+    ///     let icon_file = icon.file_for_size(32);
+    /// }
     /// ```
     pub fn file_for_size(&self, size: u16) -> &IconFile {
         // If we don't filter, then there is always at least one file on disk.
@@ -339,8 +342,9 @@ impl Icon {
     /// use icon_loader::{IconLoader, IconType};
     ///
     /// let loader = IconLoader::new();
-    /// let icon = loader.load_icon("minimum").unwrap();
-    /// let icon_file = icon.file_for_size_filtered(32, |file| file.icon_type() == IconType::PNG);
+    /// if let Ok(icon) = loader.load_icon("minimum") {
+    ///     let icon_file = icon.file_for_size_filtered(32, |file| file.icon_type() == IconType::PNG);
+    /// }
     /// ```
     ///
     /// See also [`file_for_size`].
