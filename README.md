@@ -10,7 +10,7 @@ A crate that loads and caches themed icons in 100% safe rust.
 Just add it to your `cargo.toml` file like this:
 ```
 [dependencies]
-icon-loader = "0.1"
+icon-loader = "0.2"
 ```
 
 ## Examples
@@ -43,7 +43,6 @@ let path = icon.file_for_size(32).path();
 ## Features
 
 Default features are "kde" and "gtk", which enable reading the default system icon theme name from the kde and gtk config files, respectively.
-Additionally you can activate the "sync" feature, which will make all provided structs and enums in this crate `Send` and `Sync`.
 
 ## License
 
