@@ -1,4 +1,5 @@
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/onur/cargo-license/master/LICENSE)
 
 # Rust Icon Loader
 
@@ -46,5 +47,5 @@ Additionally you can activate the "sync" feature, which will make all provided s
 
 ## License
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/onur/cargo-license/master/LICENSE)
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
