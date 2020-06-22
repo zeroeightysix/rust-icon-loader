@@ -30,16 +30,6 @@ pub enum Error {
     /// Wrapper for errors returned by custom [`SearchPathsProvider`].
     ///
     /// [`SearchPathsProvider`]: ../struct.SearchPathsProvider.html
-    #[cfg(not(feature = "sync"))]
-    Custom {
-        /// The source for the error.
-        source: Box<dyn StdError>,
-    },
-
-    /// Wrapper for errors returned by custom [`SearchPathsProvider`].
-    ///
-    /// [`SearchPathsProvider`]: ../struct.SearchPathsProvider.html
-    #[cfg(feature = "sync")]
     Custom {
         /// The source for the error.
         source: Box<dyn StdError + Send + Sync>,

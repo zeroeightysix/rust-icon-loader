@@ -1,21 +1,9 @@
-mod cache;
-
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::path::PathBuf;
-
-use cache::ImplCache;
+use std::{borrow::Cow, path::PathBuf, sync::Arc};
 
 use crate::error::{Error, Result};
 use crate::{Icon, IconThemes, SearchPaths, ThemeNameProvider};
 
-use super::RefCounted;
-
-#[cfg(not(feature = "sync"))]
-type Mutable<T> = std::cell::RefCell<T>;
-
-#[cfg(feature = "sync")]
-type Mutable<T> = std::sync::RwLock<T>;
+use dashmap::DashMap;
 
 /// The central icon loader struct.
 ///
@@ -24,8 +12,8 @@ type Mutable<T> = std::sync::RwLock<T>;
 pub struct IconLoader {
     theme_name: String,
     fallback_theme_name: String,
-    theme_cache: Mutable<HashMap<String, RefCounted<IconThemes>>>,
-    icon_cache: Mutable<HashMap<String, Option<RefCounted<Icon>>>>,
+    theme_cache: DashMap<String, Arc<IconThemes>>,
+    icon_cache: DashMap<String, Option<Arc<Icon>>>,
     search_paths: SearchPaths,
     theme_name_provider: ThemeNameProvider,
 }
@@ -45,11 +33,14 @@ impl IconLoader {
 
     /// Loads the icon with the name `icon_name` from the current icon theme.
     /// If the icon cannot be found, it will be looked for in the fallback icon theme.
-    pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Result<RefCounted<Icon>> {
+    pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Result<Arc<Icon>> {
         let icon_name = icon_name.as_ref();
 
         if let Some(icon) = self.icon_cache.get(icon_name) {
-            return icon.ok_or_else(|| Error::icon_not_found(icon_name));
+            return icon
+                .value()
+                .clone()
+                .ok_or_else(|| Error::icon_not_found(icon_name));
         }
 
         let mut searched_themes = Vec::new();
@@ -57,7 +48,7 @@ impl IconLoader {
         let icon = self
             .find_icon(self.theme_name(), icon_name, &mut searched_themes)
             .or_else(|| self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes))
-            .map(RefCounted::from);
+            .map(Arc::from);
 
         self.icon_cache.insert(icon_name.into(), icon.clone());
 
@@ -212,12 +203,12 @@ impl IconLoader {
         !self.load_themes(theme_name).is_empty()
     }
 
-    fn load_themes(&self, theme_name: &str) -> RefCounted<IconThemes> {
+    fn load_themes(&self, theme_name: &str) -> Arc<IconThemes> {
         if let Some(theme) = self.theme_cache.get(theme_name) {
-            return theme;
+            return theme.value().clone();
         }
 
-        let new_themes = RefCounted::from(IconThemes::find(theme_name, &self.search_paths()));
+        let new_themes = Arc::from(IconThemes::find(theme_name, &self.search_paths()));
 
         self.theme_cache
             .insert(theme_name.into(), new_themes.clone());

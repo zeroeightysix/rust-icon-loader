@@ -1,8 +1,6 @@
 //!
 //! Crate to load and cache themed icons.
 //!
-//! If you enable the `sync` feature flag, all provided structs and enums will be [`Send`] and [`Sync`].
-//!
 //! # Examples
 //!
 //! * Loading icons from the default icon theme set in KDE:
@@ -31,9 +29,6 @@
 //!     let path = icon.file_for_size(32).path();
 //! }
 //! ```
-//!
-//! [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
-//! [`Sync`]: https://doc.rust-lang.org/std/marker/trait.Sync.html
 
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
@@ -49,14 +44,11 @@ pub use loader::*;
 pub use search_paths::SearchPaths;
 pub use theme_name_provider::ThemeNameProvider;
 
-use std::borrow::Borrow;
-use std::path::{Path, PathBuf};
-
-#[cfg(not(feature = "sync"))]
-type RefCounted<T> = std::rc::Rc<T>;
-
-#[cfg(feature = "sync")]
-type RefCounted<T> = std::sync::Arc<T>;
+use std::{
+    borrow::Borrow,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct IconThemes {
@@ -145,7 +137,7 @@ impl IconThemes {
                                 }
 
                                 if dir_info.is_valid() {
-                                    theme.key_list.push(RefCounted::new(dir_info));
+                                    theme.key_list.push(Arc::new(dir_info));
                                 }
                             }
                         }
@@ -188,7 +180,7 @@ impl IconThemes {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct IconTheme {
     content_dir: PathBuf,
-    key_list: Vec<RefCounted<IconDir>>,
+    key_list: Vec<Arc<IconDir>>,
 }
 
 impl IconTheme {
@@ -423,7 +415,7 @@ impl AsRef<str> for IconType {
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
 #[allow(missing_docs)]
 pub struct IconFile {
-    dir_info: RefCounted<IconDir>,
+    dir_info: Arc<IconDir>,
     path: PathBuf,
     icon_type: IconType,
 }

@@ -16,9 +16,7 @@ kde = []
 # Adds the ability to read the default theme name from '~/.config/gtk-3.0/settings.ini'.
 gtk = []
 
-# Makes the icon loader `Send` and `Sync`.
-sync = []
-
 [dependencies]
 xdg = "2.2"
 rust-ini = "0.15"
+dashmap = "3.11"

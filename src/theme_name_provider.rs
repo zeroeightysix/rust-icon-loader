@@ -23,11 +23,6 @@ pub enum ThemeNameProvider {
     User(String),
 
     /// A custom function that returns a theme name or an error.
-    #[cfg(all(not(feature = "sync"), not(feature = "watching")))]
-    Custom(Box<dyn Fn() -> std::result::Result<String, Box<dyn StdError>>>),
-
-    /// A custom function that returns a theme name or an error.
-    #[cfg(any(feature = "sync", feature = "watching"))]
     Custom(
         Box<dyn Fn() -> std::result::Result<String, Box<dyn StdError + Send + Sync>> + Send + Sync>,
     ),
@@ -40,18 +35,6 @@ impl ThemeNameProvider {
     }
 
     /// Creates a new custom `ThemeNameProvider` from the given function.
-    #[cfg(not(feature = "sync"))]
-    pub fn custom<F, S, E>(f: F) -> Self
-    where
-        F: Fn() -> std::result::Result<S, E> + 'static,
-        S: Into<String>,
-        E: StdError + 'static,
-    {
-        ThemeNameProvider::Custom(Box::new(move || f().map(Into::into).map_err(E::into)))
-    }
-
-    /// Creates a new custom `ThemeNameProvider` from the given function.
-    #[cfg(feature = "sync")]
     pub fn custom<F, S, E>(f: F) -> Self
     where
         F: Fn() -> std::result::Result<S, E> + Send + Sync + 'static,
@@ -156,19 +139,6 @@ impl PartialEq for ThemeNameProvider {
     }
 }
 
-#[cfg(all(not(feature = "sync"), not(feature = "watching")))]
-impl<F, S, E> From<F> for ThemeNameProvider
-where
-    F: Fn() -> std::result::Result<S, E> + 'static,
-    S: Into<String>,
-    E: StdError + 'static,
-{
-    fn from(f: F) -> Self {
-        ThemeNameProvider::custom(f)
-    }
-}
-
-#[cfg(any(feature = "sync", feature = "watching"))]
 impl<F, S, E> From<F> for ThemeNameProvider
 where
     F: Fn() -> std::result::Result<S, E> + Send + Sync + 'static,
