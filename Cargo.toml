@@ -7,6 +7,10 @@ edition = "2018"
 description = "Crate to load and cache themed icons in 100% safe rust."
 repository = "https://gitlab.com/Maldela/rust-icon-loader"
 
+[badges]
+gitlab = { repository = "https://gitlab.com/Maldela/rust-icon-loader", branch = "master" }
+maintenance = { status = "actively-developed" }
+
 [features]
 default = ["kde", "gtk"]
 
