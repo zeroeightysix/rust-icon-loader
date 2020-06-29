@@ -13,6 +13,11 @@ Just add it to your `cargo.toml` file like this:
 icon-loader = "0.2"
 ```
 
+## Cargo-Features
+
+* `kde`: Standard feature that lets you read the default system theme name from '~/.config/kdeglobals'.
+* `gtk`: Standard feature that lets you read the default system theme name from '~/.config/gtk-3.0/settings.ini'.
+
 ## Examples
 
 * Loading icons from the default icon theme set in KDE:
