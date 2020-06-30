@@ -7,7 +7,7 @@ edition = "2018"
 description = "Crate to load and cache themed icons in 100% safe rust."
 repository = "https://gitlab.com/Maldela/rust-icon-loader"
 readme = "README.md"
-keywords = ["icon", "theme", "laoder"]
+keywords = ["icon", "theme", "loader"]
 categories = ["caching"]
 
 [badges]
