@@ -45,10 +45,6 @@ let icon = loader.load_icon("icon_name").unwrap();
 let path = icon.file_for_size(32).path();
 ```
 
-## Features
-
-Default features are "kde" and "gtk", which enable reading the default system icon theme name from the kde and gtk config files, respectively.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
