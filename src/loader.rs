@@ -1,7 +1,11 @@
 use std::{borrow::Cow, path::PathBuf, sync::Arc};
 
-use crate::error::{Error, Result};
-use crate::{Icon, IconThemes, SearchPaths, ThemeNameProvider};
+use crate::{
+    error::{Error, Result},
+    icon::{Icon, IconThemes},
+    search_paths::SearchPaths,
+    theme_name_provider::ThemeNameProvider,
+};
 
 use dashmap::DashMap;
 
@@ -234,7 +238,7 @@ impl IconLoader {
             return Some(icon);
         }
 
-        for parent in &themes.parents {
+        for parent in themes.parents() {
             if !searched_themes.contains(parent) {
                 if let Some(icon) = self.find_icon(parent, icon_name, searched_themes) {
                     return Some(icon);
