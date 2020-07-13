@@ -2,7 +2,7 @@ use super::{Icon, IconDir, IconFile, IconFileType};
 
 use std::{path::PathBuf, sync::Arc};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub(crate) struct IconTheme {
     content_dir: PathBuf,
     key_list: Vec<Arc<IconDir>>,
@@ -84,7 +84,7 @@ impl IconTheme {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub(crate) struct IconThemes {
     name: String,
     themes: Vec<IconTheme>,
