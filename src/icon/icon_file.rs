@@ -40,9 +40,9 @@ impl AsRef<str> for IconFileType {
 /// Struct containing information about a single icon file on disk.
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct IconFile {
-    pub(crate) dir_info: Arc<IconDir>,
-    pub(crate) path: PathBuf,
-    pub(crate) icon_type: IconFileType,
+    dir_info: Arc<IconDir>,
+    path: PathBuf,
+    icon_type: IconFileType,
 }
 
 impl IconFile {
@@ -59,6 +59,18 @@ impl IconFile {
     /// Returns this icon's type.
     pub const fn icon_type(&self) -> IconFileType {
         self.icon_type
+    }
+
+    pub(crate) const fn new(
+        dir_info: Arc<IconDir>,
+        path: PathBuf,
+        icon_type: IconFileType,
+    ) -> Self {
+        Self {
+            dir_info,
+            path,
+            icon_type,
+        }
     }
 }
 

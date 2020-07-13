@@ -71,11 +71,7 @@ impl IconTheme {
                     .with_extension(icon_type.as_ref());
 
                 if icon_path.exists() {
-                    entries.push(IconFile {
-                        dir_info: icon_dir_info.clone(),
-                        path: icon_path,
-                        icon_type: *icon_type,
-                    });
+                    entries.push(IconFile::new(icon_dir_info.clone(), icon_path, *icon_type));
                 }
             }
         }
