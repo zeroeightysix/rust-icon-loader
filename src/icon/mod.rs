@@ -88,6 +88,21 @@ impl Icon {
             return Some(icon_file);
         }
 
+        // Try to return a threshold fit.
+        if let Some(icon_file) = files
+            .iter()
+            .filter(|file| {
+                file.dir_info().dir_type() == IconDirType::Threshold
+                    && file.dir_info().threshold().is_some()
+            })
+            .find(|file| {
+                size >= file.dir_info().size() - file.dir_info().threshold().unwrap()
+                    && size <= file.dir_info().size() + file.dir_info().threshold().unwrap()
+            })
+        {
+            return Some(icon_file);
+        }
+
         // Try to return a slightly bigger fit.
         if let Some(icon_file) = files
             .iter()
