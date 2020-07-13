@@ -1,3 +1,7 @@
+pub mod error;
+
+pub use error::{Error, Result};
+
 use super::{Icon, IconDir, IconFile, IconFileType};
 
 use std::{path::PathBuf, sync::Arc};
@@ -9,14 +13,14 @@ pub(crate) struct IconTheme {
 }
 
 impl IconTheme {
-    fn from_dir(content_dir: PathBuf, parents: &mut Vec<String>) -> Option<Self> {
+    fn from_dir(content_dir: PathBuf, parents: &mut Vec<String>) -> Result<Self> {
         if !content_dir.is_dir() {
-            return None;
+            return Err(Error::NotDirectory);
         }
 
         let theme_index_path = content_dir.join("index.theme");
         if !theme_index_path.is_file() {
-            return None;
+            return Err(Error::IndexThemeNotFound);
         }
 
         let mut theme = Self {
@@ -24,35 +28,38 @@ impl IconTheme {
             key_list: Vec::new(),
         };
 
-        if let Ok(ini) = ini::Ini::load_from_file(theme_index_path) {
-            for (dir_key, properties) in ini.iter() {
-                if let Some(dir_key) = dir_key {
-                    match dir_key {
-                        "Icon Theme" => {
-                            for (key, value) in properties.iter() {
-                                if key == "Inherits" {
-                                    for parent in value.split(',').map(str::trim).map(String::from)
-                                    {
-                                        if !parents.contains(&parent) {
-                                            parents.push(parent);
-                                        }
+        let ini = ini::Ini::load_from_file(theme_index_path)?;
+
+        for (dir_key, properties) in ini.iter() {
+            if let Some(dir_key) = dir_key {
+                match dir_key {
+                    "Icon Theme" => {
+                        for (key, value) in properties.iter() {
+                            if key == "Inherits" {
+                                for parent in value.split(',').map(str::trim).map(String::from) {
+                                    if !parents.contains(&parent) {
+                                        parents.push(parent);
                                     }
                                 }
                             }
                         }
-                        _ => {
-                            let dir_info = IconDir::new(dir_key.into(), properties);
+                    }
+                    _ => {
+                        let dir_info = IconDir::new(dir_key.into(), properties);
 
-                            if dir_info.is_valid() {
-                                theme.key_list.push(Arc::new(dir_info));
-                            }
+                        if dir_info.is_valid() {
+                            theme.key_list.push(Arc::new(dir_info));
                         }
                     }
                 }
             }
         }
 
-        Some(theme)
+        if theme.key_list.is_empty() {
+            return Err(Error::KeyListEmpty);
+        }
+
+        Ok(theme)
     }
 
     fn entries(&self, icon_name: &str) -> Vec<IconFile> {
@@ -98,7 +105,7 @@ impl IconThemes {
         for search_path in search_paths {
             let content_dir = search_path.join(theme_name);
 
-            if let Some(theme) = IconTheme::from_dir(content_dir, &mut themes.parents) {
+            if let Ok(theme) = IconTheme::from_dir(content_dir, &mut themes.parents) {
                 themes.themes.push(theme);
             }
         }

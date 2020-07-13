@@ -4,6 +4,7 @@ mod icon_theme;
 
 pub use icon_dir::{IconDir, IconDirType};
 pub use icon_file::{IconFile, IconFileType};
+pub use icon_theme::error::{Error, Result};
 
 pub(crate) use icon_theme::IconThemes;
 
