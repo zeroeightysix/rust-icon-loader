@@ -42,39 +42,7 @@ impl IconTheme {
                             }
                         }
                         _ => {
-                            let mut dir_info = IconDir::new(dir_key.into());
-
-                            for (key, value) in properties.iter() {
-                                match key {
-                                    "Size" => {
-                                        if let Ok(size) = value.parse() {
-                                            dir_info.size = size;
-                                        }
-                                    }
-                                    "Type" => dir_info.dir_type = value.into(),
-                                    "Threshold" => {
-                                        if let Ok(threshold) = value.parse() {
-                                            dir_info.threshold = Some(threshold);
-                                        }
-                                    }
-                                    "MinSize" => {
-                                        if let Ok(min_size) = value.parse() {
-                                            dir_info.min_size = Some(min_size);
-                                        }
-                                    }
-                                    "MaxSize" => {
-                                        if let Ok(max_size) = value.parse() {
-                                            dir_info.max_size = Some(max_size);
-                                        }
-                                    }
-                                    "Scale" => {
-                                        if let Ok(scale) = value.parse() {
-                                            dir_info.scale = scale;
-                                        }
-                                    }
-                                    _ => {}
-                                }
-                            }
+                            let dir_info = IconDir::new(dir_key.into(), properties);
 
                             if dir_info.is_valid() {
                                 theme.key_list.push(Arc::new(dir_info));

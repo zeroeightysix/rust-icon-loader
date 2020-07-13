@@ -46,7 +46,7 @@ mod search_paths;
 mod theme_name_provider;
 
 pub use error::{Error, ProviderError, Result};
-pub use icon::{Icon, IconDir, IconFile, IconFileType};
+pub use icon::{Icon, IconDir, IconDirType, IconFile, IconFileType};
 pub use loader::*;
 pub use search_paths::SearchPaths;
 pub use theme_name_provider::ThemeNameProvider;

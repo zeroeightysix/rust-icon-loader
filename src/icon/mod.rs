@@ -2,7 +2,7 @@ mod icon_dir;
 mod icon_file;
 mod icon_theme;
 
-pub use icon_dir::IconDir;
+pub use icon_dir::{IconDir, IconDirType};
 pub use icon_file::{IconFile, IconFileType};
 
 pub(crate) use icon_theme::IconThemes;
