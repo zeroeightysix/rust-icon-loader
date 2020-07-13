@@ -9,7 +9,7 @@ pub(crate) struct IconTheme {
 }
 
 impl IconTheme {
-    fn from_dir(content_dir: PathBuf) -> Option<(Self, Vec<String>)> {
+    fn from_dir(content_dir: PathBuf, parents: &mut Vec<String>) -> Option<Self> {
         if !content_dir.is_dir() {
             return None;
         }
@@ -23,7 +23,6 @@ impl IconTheme {
             content_dir,
             key_list: Vec::new(),
         };
-        let mut parents = Vec::new();
 
         if let Ok(ini) = ini::Ini::load_from_file(theme_index_path) {
             for (dir_key, properties) in ini.iter() {
@@ -53,11 +52,7 @@ impl IconTheme {
             }
         }
 
-        if theme.key_list.is_empty() {
-            None
-        } else {
-            Some((theme, parents))
-        }
+        Some(theme)
     }
 
     fn entries(&self, icon_name: &str) -> Vec<IconFile> {
@@ -107,13 +102,7 @@ impl IconThemes {
         for search_path in search_paths {
             let content_dir = search_path.join(theme_name);
 
-            if let Some((theme, parents)) = IconTheme::from_dir(content_dir) {
-                for parent in parents {
-                    if !themes.parents.contains(&parent) {
-                        themes.parents.push(parent);
-                    }
-                }
-
+            if let Some(theme) = IconTheme::from_dir(content_dir, &mut themes.parents) {
                 themes.themes.push(theme);
             }
         }
