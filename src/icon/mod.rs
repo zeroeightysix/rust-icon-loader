@@ -81,16 +81,16 @@ impl Icon {
     where
         F: Fn(&IconFile) -> bool,
     {
-        let files: Vec<&IconFile> = self.files.iter().filter(|file| filter(file)).collect();
+        let files = self.files.iter().filter(|file| filter(file));
 
         // Try to return an exact fit.
-        if let Some(icon_file) = files.iter().find(|file| size == file.dir_info().size()) {
+        if let Some(icon_file) = files.clone().find(|file| size == file.dir_info().size()) {
             return Some(icon_file);
         }
 
         // Try to return a threshold fit.
         if let Some(icon_file) = files
-            .iter()
+            .clone()
             .filter(|file| file.dir_info().dir_type() == IconDirType::Threshold)
             .find(|file| {
                 size >= file.dir_info().size() - file.dir_info().threshold()
@@ -102,7 +102,7 @@ impl Icon {
 
         // Try to return a slightly bigger fit.
         if let Some(icon_file) = files
-            .iter()
+            .clone()
             .filter(|file| file.dir_info().size() > size)
             .min_by_key(|file| file.dir_info().size())
         {
@@ -110,7 +110,7 @@ impl Icon {
         }
 
         // Return the biggest available.
-        files.into_iter().max_by_key(|file| file.dir_info().size())
+        files.max_by_key(|file| file.dir_info().size())
     }
 
     pub(crate) fn new(icon_name: String, theme_name: String, files: Vec<IconFile>) -> Option<Self> {
