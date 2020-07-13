@@ -5,12 +5,12 @@ use std::path::{Path, PathBuf};
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct IconDir {
     path: PathBuf,
-    pub(crate) size: u16,
-    pub(crate) scale: u16,
-    pub(crate) dir_type: IconDirType,
-    pub(crate) max_size: Option<u16>,
-    pub(crate) min_size: Option<u16>,
-    pub(crate) threshold: Option<u16>,
+    size: u16,
+    scale: u16,
+    dir_type: IconDirType,
+    max_size: Option<u16>,
+    min_size: Option<u16>,
+    threshold: Option<u16>,
 }
 
 impl IconDir {
