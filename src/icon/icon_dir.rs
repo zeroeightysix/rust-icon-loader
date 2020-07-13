@@ -81,21 +81,18 @@ impl IconDir {
     }
 
     /// Returns the max size of icons contained.
-    /// Returns `None`, if icons in this dir are not scalable.
-    pub const fn max_size(&self) -> Option<u16> {
-        self.max_size
+    pub fn max_size(&self) -> u16 {
+        self.max_size.unwrap_or_else(|| self.size())
     }
 
     /// Returns the min size of icons contained.
-    /// Returns `None`, if icons in this dir are not scalable.
-    pub const fn min_size(&self) -> Option<u16> {
-        self.min_size
+    pub fn min_size(&self) -> u16 {
+        self.min_size.unwrap_or_else(|| self.size())
     }
 
     /// Returns the threshold of icons contained.
-    /// Returns `None`, if icons in this dir are not of type threshold.
-    pub const fn threshold(&self) -> Option<u16> {
-        self.threshold
+    pub fn threshold(&self) -> u16 {
+        self.threshold.unwrap_or(2)
     }
 
     pub(crate) const fn is_valid(&self) -> bool {
