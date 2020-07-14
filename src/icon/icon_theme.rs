@@ -24,7 +24,7 @@ impl IconTheme {
         }
 
         let mut theme = Self {
-            content_dir: content_dir.clone(),
+            content_dir: content_dir,
             key_list: Vec::new(),
         };
 
@@ -56,7 +56,7 @@ impl IconTheme {
         }
 
         if theme.key_list.is_empty() {
-            return Err(Error::KeyListEmpty(content_dir));
+            return Err(Error::KeyListEmpty(theme.content_dir));
         }
 
         Ok(theme)
