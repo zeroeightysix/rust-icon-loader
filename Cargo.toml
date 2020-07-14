@@ -23,7 +23,11 @@ kde = []
 # Adds the ability to read the default theme name from '~/.config/gtk-3.0/settings.ini'.
 gtk = []
 
+# Log icon theme error messages. Only useful for debugging malformed icon themes.
+theme_error_log = ["log"]
+
 [dependencies]
 xdg = "2.2"
 rust-ini = "0.15"
 dashmap = "3.11"
+log = { version = "0.4", optional = true }

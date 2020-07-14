@@ -15,8 +15,14 @@ icon-loader = "0.2"
 
 ## Cargo-Features
 
-* `kde`: Standard feature that lets you read the default system theme name from '~/.config/kdeglobals'.
-* `gtk`: Standard feature that lets you read the default system theme name from '~/.config/gtk-3.0/settings.ini'.
+### Standard Features
+
+* `kde`: Feature that lets you read the default system theme name from '~/.config/kdeglobals'.
+* `gtk`: Feature that lets you read the default system theme name from '~/.config/gtk-3.0/settings.ini'.
+
+### Additional Features
+
+* `theme_error_log`: Feature that uses the [`log`](https://crates.io/crates/log) crate to log errors that occur while parsing icon themes. 
 
 ## Examples
 

@@ -15,16 +15,16 @@ pub(crate) struct IconTheme {
 impl IconTheme {
     fn from_dir(content_dir: PathBuf, parents: &mut Vec<String>) -> Result<Self> {
         if !content_dir.is_dir() {
-            return Err(Error::NotDirectory);
+            return Err(Error::NotDirectory(content_dir.clone()));
         }
 
         let theme_index_path = content_dir.join("index.theme");
         if !theme_index_path.is_file() {
-            return Err(Error::IndexThemeNotFound);
+            return Err(Error::IndexThemeNotFound(theme_index_path));
         }
 
         let mut theme = Self {
-            content_dir,
+            content_dir: content_dir.clone(),
             key_list: Vec::new(),
         };
 
@@ -56,7 +56,7 @@ impl IconTheme {
         }
 
         if theme.key_list.is_empty() {
-            return Err(Error::KeyListEmpty);
+            return Err(Error::KeyListEmpty(content_dir));
         }
 
         Ok(theme)
@@ -105,8 +105,16 @@ impl IconThemes {
         for search_path in search_paths {
             let content_dir = search_path.join(theme_name);
 
-            if let Ok(theme) = IconTheme::from_dir(content_dir, &mut themes.parents) {
-                themes.themes.push(theme);
+            match IconTheme::from_dir(content_dir, &mut themes.parents) {
+                Ok(theme) => themes.themes.push(theme),
+                Err(_e) =>
+                {
+                    #[cfg(feature = "theme_error_log")]
+                    match _e {
+                        Error::NotDirectory(_) => log::debug!("{}", _e),
+                        _ => log::warn!("{}", _e),
+                    }
+                }
             }
         }
 

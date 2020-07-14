@@ -3,15 +3,16 @@ use ini::ini::Error as IniError;
 use std::{
     error::Error as StdError,
     fmt::{Display, Formatter, Result as FmtResult},
+    path::PathBuf,
 };
 
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    NotDirectory,
-    IndexThemeNotFound,
-    KeyListEmpty,
+    NotDirectory(PathBuf),
+    IndexThemeNotFound(PathBuf),
+    KeyListEmpty(PathBuf),
     Ini(IniError),
 }
 
@@ -27,9 +28,15 @@ impl StdError for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            Error::NotDirectory => write!(f, "Provided path is not a directory."),
-            Error::IndexThemeNotFound => write!(f, "File 'index.theme' could not be found."),
-            Error::KeyListEmpty => write!(f, "Icon theme has no valid key entries."),
+            Error::NotDirectory(path) => write!(f, "{} is not a directory.", path.display()),
+            Error::IndexThemeNotFound(path) => {
+                write!(f, "File {} could not be found.", path.display())
+            }
+            Error::KeyListEmpty(path) => write!(
+                f,
+                "Icon theme with path {} has no valid key entries.",
+                path.display()
+            ),
             Error::Ini(e) => write!(f, "Error reading 'theme.index' file: {}", e),
         }
     }
