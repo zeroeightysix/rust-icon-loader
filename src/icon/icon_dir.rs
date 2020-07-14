@@ -75,7 +75,7 @@ impl IconDir {
         self.size
     }
 
-    /// Returns the unscaled size of the icons contained.
+    /// Returns the scale of the icons contained.
     pub const fn scale(&self) -> u16 {
         self.scale
     }
