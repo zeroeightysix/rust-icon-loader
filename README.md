@@ -10,7 +10,7 @@ A crate that loads and caches themed icons in 100% safe rust.
 Just add it to your `cargo.toml` file like this:
 ```
 [dependencies]
-icon-loader = "0.2"
+icon-loader = "0.3"
 ```
 
 ## Cargo-Features
