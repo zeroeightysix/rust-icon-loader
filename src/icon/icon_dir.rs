@@ -8,7 +8,7 @@ pub struct IconDir {
     size: u16,
     scale: u16,
     context: Option<String>,
-    dir_type: IconDirType,
+    size_type: IconSizeType,
     max_size: Option<u16>,
     min_size: Option<u16>,
     threshold: Option<u16>,
@@ -21,7 +21,7 @@ impl IconDir {
             size: 0,
             scale: 1,
             context: None,
-            dir_type: IconDirType::Threshold,
+            size_type: IconSizeType::Threshold,
             max_size: None,
             min_size: None,
             threshold: None,
@@ -42,7 +42,7 @@ impl IconDir {
                 "Context" => {
                     dir_info.context = Some(String::from(value));
                 }
-                "Type" => dir_info.dir_type = value.into(),
+                "Type" => dir_info.size_type = value.into(),
                 "Threshold" => {
                     if let Ok(threshold) = value.parse() {
                         dir_info.threshold = Some(threshold);
@@ -86,8 +86,8 @@ impl IconDir {
     }
 
     /// Returns the type of icon sizes contained.
-    pub const fn dir_type(&self) -> IconDirType {
-        self.dir_type
+    pub const fn size_type(&self) -> IconSizeType {
+        self.size_type
     }
 
     /// Returns the max size of icons contained.
@@ -114,7 +114,7 @@ impl IconDir {
 /// The size type of icons contained in an [`IconDir`].
 ///
 /// [`IconDir`]: struct.IconDir.html
-pub enum IconDirType {
+pub enum IconSizeType {
     /// Icons with a fixed size.
     Fixed,
 
@@ -125,12 +125,12 @@ pub enum IconDirType {
     Threshold,
 }
 
-impl<S: AsRef<str>> From<S> for IconDirType {
+impl<S: AsRef<str>> From<S> for IconSizeType {
     fn from(s: S) -> Self {
         match s.as_ref() {
-            "Fixed" => IconDirType::Fixed,
-            "Scalable" => IconDirType::Scalable,
-            _ => IconDirType::Threshold,
+            "Fixed" => IconSizeType::Fixed,
+            "Scalable" => IconSizeType::Scalable,
+            _ => IconSizeType::Threshold,
         }
     }
 }

@@ -1,4 +1,4 @@
-use super::{IconDir, IconDirType};
+use super::{IconDir, IconSizeType};
 
 use std::{
     borrow::Borrow,
@@ -77,8 +77,8 @@ impl IconFile {
     }
 
     /// Returns this icon's type.
-    pub fn dir_type(&self) -> IconDirType {
-        self.dir_info.dir_type()
+    pub fn size_type(&self) -> IconSizeType {
+        self.dir_info.size_type()
     }
 
     /// Returns this icon's max size.

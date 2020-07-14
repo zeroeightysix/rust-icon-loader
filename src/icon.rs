@@ -2,7 +2,7 @@ mod icon_dir;
 mod icon_file;
 mod icon_theme;
 
-pub use icon_dir::{IconDir, IconDirType};
+pub use icon_dir::{IconDir, IconSizeType};
 pub use icon_file::{IconFile, IconFileType};
 pub use icon_theme::error::{Error, Result};
 
@@ -92,7 +92,7 @@ impl Icon {
         // Try to return a threshold fit.
         if let Some(icon_file) = files
             .clone()
-            .filter(|file| file.dir_info().dir_type() == IconDirType::Threshold)
+            .filter(|file| file.dir_info().size_type() == IconSizeType::Threshold)
             .find(|file| {
                 size >= file.dir_info().size() - file.dir_info().threshold()
                     && size <= file.dir_info().size() + file.dir_info().threshold()
