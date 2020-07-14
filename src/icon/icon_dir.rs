@@ -7,6 +7,7 @@ pub struct IconDir {
     path: PathBuf,
     size: u16,
     scale: u16,
+    context: Option<String>,
     dir_type: IconDirType,
     max_size: Option<u16>,
     min_size: Option<u16>,
@@ -16,13 +17,14 @@ pub struct IconDir {
 impl IconDir {
     pub(crate) fn new(path: PathBuf, properties: &ini::ini::Properties) -> Self {
         let mut dir_info = Self {
-            dir_type: IconDirType::Threshold,
             path,
             size: 0,
+            scale: 1,
+            context: None,
+            dir_type: IconDirType::Threshold,
             max_size: None,
             min_size: None,
             threshold: None,
-            scale: 1,
         };
 
         for (key, value) in properties.iter() {
@@ -31,6 +33,14 @@ impl IconDir {
                     if let Ok(size) = value.parse() {
                         dir_info.size = size;
                     }
+                }
+                "Scale" => {
+                    if let Ok(scale) = value.parse() {
+                        dir_info.scale = scale;
+                    }
+                }
+                "Context" => {
+                    dir_info.context = Some(String::from(value));
                 }
                 "Type" => dir_info.dir_type = value.into(),
                 "Threshold" => {
@@ -46,11 +56,6 @@ impl IconDir {
                 "MaxSize" => {
                     if let Ok(max_size) = value.parse() {
                         dir_info.max_size = Some(max_size);
-                    }
-                }
-                "Scale" => {
-                    if let Ok(scale) = value.parse() {
-                        dir_info.scale = scale;
                     }
                 }
                 _ => {}
@@ -73,6 +78,11 @@ impl IconDir {
     /// Returns the unscaled size of the icons contained.
     pub const fn scale(&self) -> u16 {
         self.scale
+    }
+
+    /// Returns the context of the icons contained.
+    pub fn context(&self) -> Option<&str> {
+        self.context.as_deref()
     }
 
     /// Returns the type of icon sizes contained.
