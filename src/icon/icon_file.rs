@@ -1,4 +1,4 @@
-use super::IconDir;
+use super::{IconDir, IconDirType};
 
 use std::{
     borrow::Borrow,
@@ -59,6 +59,41 @@ impl IconFile {
     /// Returns this icon's type.
     pub const fn icon_type(&self) -> IconFileType {
         self.icon_type
+    }
+
+    /// Returns this icon's size.
+    pub fn size(&self) -> u16 {
+        self.dir_info.size()
+    }
+
+    /// Returns this icon's scale.
+    pub fn scale(&self) -> u16 {
+        self.dir_info.scale()
+    }
+
+    /// Returns this icon's context.
+    pub fn context(&self) -> Option<&str> {
+        self.dir_info.context()
+    }
+
+    /// Returns this icon's type.
+    pub fn dir_type(&self) -> IconDirType {
+        self.dir_info.dir_type()
+    }
+
+    /// Returns this icon's max size.
+    pub fn max_size(&self) -> u16 {
+        self.dir_info.max_size()
+    }
+
+    /// Returns this icon's min size.
+    pub fn min_size(&self) -> u16 {
+        self.dir_info.min_size()
+    }
+
+    /// Returns this icon's size threshold.
+    pub fn threshold(&self) -> u16 {
+        self.dir_info.threshold()
     }
 
     pub(crate) const fn new(
