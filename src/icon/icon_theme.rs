@@ -15,7 +15,7 @@ pub(crate) struct IconTheme {
 impl IconTheme {
     fn from_dir(content_dir: PathBuf, parents: &mut Vec<String>) -> Result<Self> {
         if !content_dir.is_dir() {
-            return Err(Error::NotDirectory(content_dir.clone()));
+            return Err(Error::NotDirectory(content_dir));
         }
 
         let theme_index_path = content_dir.join("index.theme");
