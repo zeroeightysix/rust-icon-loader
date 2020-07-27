@@ -32,9 +32,10 @@ impl Icon {
         &self.files
     }
 
-    /// Returns the file of the associated icon that fits the given size best.
+    /// Returns the file of the associated icon that fits the given size best and has a scale of 1.
     /// If there is no exact fit available, the next bigger one is chosen.
-    /// If there is no bigger one, the next smaller is returned.
+    /// If there is no bigger one, the next smaller one is returned.
+    /// If that cannot be found, the scale restriction is ignored.
     ///
     /// # Arguments
     ///
@@ -51,11 +52,49 @@ impl Icon {
     /// }
     /// ```
     pub fn file_for_size(&self, size: u16) -> &IconFile {
-        // If we don't filter, then there is always at least one file on disk.
+        self.file_for_size_scaled(size, 1)
+    }
+
+    /// Returns the file of the associated icon that fits the given size and scale best.
+    /// If there is no exact fit available, the next bigger size is chosen.
+    /// If there is no bigger fit with the given scale, the next smaller one is returned.
+    /// If no file with the preferred scale can be found, one with the size `size * scale` and scale 1 is looked for.
+    /// If that cannot be found, the scale restriction is ignored.
+    ///
+    /// # Arguments
+    ///
+    /// * `size` - The ideal size of the returned icon file.
+    /// * `scale` - The preferred scale of the returned icon file.
+    ///
+    ///# Example
+    ///
+    /// ```
+    /// use icon_loader::IconLoader;
+    ///
+    /// let loader = IconLoader::new();
+    /// if let Ok(icon) = loader.load_icon("minimum") {
+    ///     let icon_file = icon.file_for_size_scaled(32, 2);
+    /// }
+    /// ```
+    pub fn file_for_size_scaled(&self, size: u16, scale: u16) -> &IconFile {
+        if let Some(file) = self.file_for_size_filtered(size, |file| file.scale() == scale) {
+            return file;
+        }
+
+        if size != 1 {
+            if let Some(file) = self.file_for_size_filtered(size * scale, |file| file.scale() == 1)
+            {
+                return file;
+            }
+        }
+
+        // If we don't filter, there is always at least one file on disk.
         self.file_for_size_filtered(size, |_| true).unwrap()
     }
 
     /// Returns the file of the associated icon that fits the given size best and matches the provided filter.
+    /// If there is no exact fit available, the next bigger one is chosen.
+    /// If there is no bigger one, the next smaller one is returned.
     /// Use this, if you want only files of type PNG or anything like that.
     ///
     /// # Arguments
@@ -74,18 +113,16 @@ impl Icon {
     /// }
     /// ```
     ///
-    /// See also [`file_for_size`].
-    ///
     /// [`IconFile`]: struct.IconFile.html
-    /// [`file_for_size`]: #method.file_for_size
-    pub fn file_for_size_filtered<F>(&self, size: u16, filter: F) -> Option<&IconFile>
-    where
-        F: Fn(&IconFile) -> bool,
-    {
-        let files = self.files.iter().filter(|file| filter(file));
+    pub fn file_for_size_filtered(
+        &self,
+        size: u16,
+        filter: impl Fn(&IconFile) -> bool,
+    ) -> Option<&IconFile> {
+        let files = self.files.iter().filter(|&file| filter(file));
 
         // Try to return an exact fit.
-        if let Some(icon_file) = files.clone().find(|file| size == file.dir_info().size()) {
+        if let Some(icon_file) = files.clone().find(|file| file.dir_info().size() == size) {
             return Some(icon_file);
         }
 
