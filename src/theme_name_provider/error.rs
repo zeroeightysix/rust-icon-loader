@@ -15,7 +15,7 @@ pub enum Error {
     /// Error loading config file.
     LoadConfig {
         /// The source for the error.
-        source: ini::ini::Error,
+        source: ini::Error,
     },
 
     /// Config does not contain valid theme name.
@@ -63,8 +63,8 @@ impl fmt::Display for Error {
     }
 }
 
-impl From<ini::ini::Error> for Error {
-    fn from(source: ini::ini::Error) -> Self {
+impl From<ini::Error> for Error {
+    fn from(source: ini::Error) -> Self {
         Error::LoadConfig { source }
     }
 }

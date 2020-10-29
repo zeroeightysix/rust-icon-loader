@@ -1,4 +1,4 @@
-use ini::ini::Error as IniError;
+use ini::Error as IniError;
 
 use std::{
     error::Error as StdError,

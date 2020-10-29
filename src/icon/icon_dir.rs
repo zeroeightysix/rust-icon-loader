@@ -15,7 +15,7 @@ pub struct IconDir {
 }
 
 impl IconDir {
-    pub(crate) fn new(path: PathBuf, properties: &ini::ini::Properties) -> Self {
+    pub(crate) fn new(path: PathBuf, properties: &ini::Properties) -> Self {
         let mut dir_info = Self {
             path,
             size: 0,

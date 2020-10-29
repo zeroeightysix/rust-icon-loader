@@ -28,6 +28,6 @@ theme_error_log = ["log"]
 
 [dependencies]
 xdg = "2.2"
-rust-ini = "0.15"
+rust-ini = "0.16"
 dashmap = "3.11"
 log = { version = "0.4", optional = true }
