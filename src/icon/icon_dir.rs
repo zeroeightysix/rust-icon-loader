@@ -111,9 +111,7 @@ impl IconDir {
 }
 
 #[derive(Clone, Copy, Hash, Debug, PartialEq, Eq)]
-/// The size type of icons contained in an [`IconDir`].
-///
-/// [`IconDir`]: struct.IconDir.html
+/// The size type of icons contained in an [`IconDir`](crate::icon::IconDir).
 pub enum IconSizeType {
     /// Icons with a fixed size.
     Fixed,

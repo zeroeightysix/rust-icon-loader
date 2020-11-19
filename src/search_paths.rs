@@ -2,9 +2,7 @@ use std::{borrow::Cow, path::PathBuf};
 
 use xdg::BaseDirectories;
 
-/// Enum that provides a list of directories to [`IconLoader`] to search for icons in.
-///
-/// [`IconLoader`]: struct.IconLoader.html
+/// Enum that provides a list of directories to [`IconLoader`](crate::IconLoader) to search for icons in.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SearchPaths {
     /// Uses the `xdg` crate for system icon paths.

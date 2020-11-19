@@ -4,9 +4,7 @@ use std::fmt;
 /// Type alias for `std::result::Result<T, Error>`
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// Error type returned by [`SearchPathsProvider`].
-///
-/// [`SearchPathsProvider`]: enum.SearchPathsProvider.html
+/// Error type returned by [`ThemeNameProvider`](crate::ThemeNameProvider).
 #[derive(Debug)]
 pub enum Error {
     /// Config file could not be found.
@@ -27,9 +25,7 @@ pub enum Error {
         source: xdg::BaseDirectoriesError,
     },
 
-    /// Wrapper for errors returned by custom [`SearchPathsProvider`].
-    ///
-    /// [`SearchPathsProvider`]: ../struct.SearchPathsProvider.html
+    /// Wrapper for errors returned by custom [`ThemeNameProvider`](crate::ThemeNameProvider).
     Custom {
         /// The source for the error.
         source: Box<dyn StdError + Send + Sync>,

@@ -100,7 +100,7 @@ impl Icon {
     /// # Arguments
     ///
     /// * `size` - The ideal size of the returned icon file.
-    /// * `filter` - A function that takes a reference to an [`IconFile`] and returns true, if it passes the test and false otherwise.
+    /// * `filter` - A function that takes a reference to an [`IconFile`](crate::icon::IconFile) and returns true, if it passes the test and false otherwise.
     ///
     /// # Example
     ///
@@ -112,8 +112,6 @@ impl Icon {
     ///     let icon_file = icon.file_for_size_filtered(32, |file| file.icon_type() == IconFileType::PNG);
     /// }
     /// ```
-    ///
-    /// [`IconFile`]: struct.IconFile.html
     pub fn file_for_size_filtered(
         &self,
         size: u16,

@@ -4,12 +4,10 @@ use std::{borrow::ToOwned, error::Error as StdError};
 
 use error::{Error, Result};
 
-/// Enum that provides a theme name to [`IconLoader`].
+/// Enum that provides a theme name to [`IconLoader`](crate::IconLoader).
 /// It can either load the system theme name from the KDE or GTK config files
 /// or provide a fixed string or provide a theme name yielded by a completely customizable function.
 /// The last option allows users to load their own config files for example.
-///
-/// [`IconLoader`]: struct.IconLoader.html
 pub enum ThemeNameProvider {
     /// Use the '~/.config/kdeglobals' file to determine the theme name.
     #[cfg(feature = "kde")]

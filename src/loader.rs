@@ -61,18 +61,14 @@ impl IconLoader {
 
     /// Returns the currently used theme name.
     ///
-    /// See also [`update_theme_name`].
-    ///
-    /// [`update_theme_name`]: struct.IconLoader.html#method.update_theme_name
+    /// See also [`IconLoader::update_theme_name()`].
     pub fn theme_name(&self) -> &str {
         &self.theme_name
     }
 
     /// Returns the currently used fallback theme name.
     ///
-    /// See also [`set_fallback_theme_name`].
-    ///
-    /// [`set_fallback_theme_name`]: struct.IconLoader.html#method.set_fallback_theme_name
+    /// See also [`IconLoader::set_fallback_theme_name()`].
     pub fn fallback_theme_name(&self) -> &str {
         &self.fallback_theme_name
     }
@@ -145,9 +141,7 @@ impl IconLoader {
     /// loader.set_theme_name_provider(ThemeNameProvider::KDE);
     /// ```
     ///
-    /// [`update_theme_name`] needs to be called after setting a new theme name provider.
-    ///
-    /// [`update_theme_name`]: struct.IconLoader.html#method.update_theme_name
+    /// [`IconLoader::update_theme_name()`] needs to be called after setting a new theme name provider.
     pub fn set_theme_name_provider(&mut self, theme_name_provider: impl Into<ThemeNameProvider>) {
         let theme_name_provider = theme_name_provider.into();
 
@@ -158,13 +152,10 @@ impl IconLoader {
         self.theme_name_provider = theme_name_provider;
     }
 
-    /// Queries the set [`ThemeNameProvider`] for the theme name to be used.
-    /// Returns an error, if the set [`ThemeNameProvider`] returns an error or the theme with the returned name cannot be found.
+    /// Queries the set [`ThemeNameProvider`](crate::ThemeNameProvider) for the theme name to be used.
+    /// Returns an error, if the set [`ThemeNameProvider`](crate::ThemeNameProvider) returns an error or the theme with the returned name cannot be found.
     ///
-    /// Set a theme name provider with [`set_theme_name_provider`].
-    ///
-    /// [`ThemeNameProvider`]: enum.ThemeNameProvider.html
-    /// [`set_theme_name_provider`]: struct.IconLoader.html#method.set_theme_name_provider
+    /// Set a theme name provider with [`IconLoader::set_theme_name_provider()`].
     pub fn update_theme_name(&mut self) -> Result<()> {
         let theme_name = self.theme_name_provider.theme_name()?;
 
