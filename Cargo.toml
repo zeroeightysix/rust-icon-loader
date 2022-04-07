@@ -29,5 +29,5 @@ theme_error_log = ["log"]
 [dependencies]
 xdg = "2.2"
 rust-ini = "0.18"
-dashmap = "4.0"
+dashmap = "5.2"
 log = { version = "0.4", optional = true }
