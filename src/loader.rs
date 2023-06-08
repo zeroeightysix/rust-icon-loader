@@ -23,16 +23,38 @@ pub struct IconLoader {
 }
 
 impl IconLoader {
-    /// Creates a new `IconLoader`.
+    /// Creates a new `IconLoader` with default settings.
     pub fn new() -> Self {
         IconLoader {
             theme_name: String::from("hicolor"),
             fallback_theme_name: String::from("hicolor"),
-            theme_name_provider: ThemeNameProvider::User(String::from("hicolor")),
+            theme_name_provider: Default::default(),
             theme_cache: Default::default(),
             icon_cache: Default::default(),
-            search_paths: SearchPaths::System,
+            search_paths: Default::default(),
         }
+    }
+
+    /// Creates a new KDE `IconLoader`.
+    /// This is a convenience function.
+    #[cfg(feature = "kde")]
+    pub fn new_kde() -> Result<Self> {
+        let mut loader = Self::new();
+        loader.set_theme_name_provider(ThemeNameProvider::KDE);
+        loader.update_theme_name()?;
+
+        Ok(loader)
+    }
+
+    /// Creates a new GTK `IconLoader`.
+    /// This is a convenience function.
+    #[cfg(feature = "gtk")]
+    pub fn new_gtk() -> Result<Self> {
+        let mut loader = Self::new();
+        loader.set_theme_name_provider(ThemeNameProvider::GTK);
+        loader.update_theme_name()?;
+
+        Ok(loader)
     }
 
     /// Loads the icon with the name `icon_name` from the current icon theme.

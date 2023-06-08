@@ -6,7 +6,7 @@ use error::{Error, Result};
 
 /// Enum that provides a theme name to [`IconLoader`](crate::IconLoader).
 /// It can either load the system theme name from the KDE or GTK config files
-/// or provide a fixed string or provide a theme name yielded by a completely customizable function.
+/// or provide a fixed string or a theme name yielded by a completely customizable function.
 /// The last option allows users to load their own config files for example.
 pub enum ThemeNameProvider {
     /// Use the '~/.config/kdeglobals' file to determine the theme name.
@@ -112,6 +112,12 @@ impl std::fmt::Debug for ThemeNameProvider {
             ThemeNameProvider::User(string) => write!(f, "ThemeNameProvider::User({})", string),
             ThemeNameProvider::Custom(_) => write!(f, "ThemeNameProvider::Custom"),
         }
+    }
+}
+
+impl Default for ThemeNameProvider {
+    fn default() -> Self {
+        ThemeNameProvider::User(String::from("hicolor"))
     }
 }
 

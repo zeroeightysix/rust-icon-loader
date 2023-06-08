@@ -33,6 +33,12 @@ impl SearchPaths {
     }
 }
 
+impl Default for SearchPaths {
+    fn default() -> Self {
+        SearchPaths::System
+    }
+}
+
 impl<I, P> From<I> for SearchPaths
 where
     I: IntoIterator<Item = P>,

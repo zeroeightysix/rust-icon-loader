@@ -3,13 +3,20 @@
 //!
 //! # Examples
 //!
+//! * Using a global [`IconLoader`](crate::IconLoader) object to load icons from the systems `hicolor` icon theme:
+//! ```
+//! use icon_loader::icon_loader_hicolor;
+//!
+//! if let Ok(icon) = icon_loader_hicolor().load_icon("audio-headphones") {
+//!     let path = icon.file_for_size(64).path();
+//! }
+//! ```
+//!
 //! * Loading icons from the default icon theme set in KDE:
 //! ```
-//! use icon_loader::{IconLoader, ThemeNameProvider};
+//! use icon_loader::IconLoader;
 //!
-//! let mut loader = IconLoader::new();
-//! loader.set_theme_name_provider(ThemeNameProvider::KDE);
-//! loader.update_theme_name();
+//! let loader = IconLoader::new_kde().unwrap();
 //!
 //! if let Ok(icon) = loader.load_icon("audio-headphones") {
 //!     let path = icon.file_for_size(64).path();
@@ -50,3 +57,12 @@ pub use icon::{Icon, IconDir, IconFile, IconFileType, IconSizeType};
 pub use loader::*;
 pub use search_paths::SearchPaths;
 pub use theme_name_provider::ThemeNameProvider;
+
+use std::sync::OnceLock;
+
+/// This function returns a reference to a global [`IconLoader`](crate::IconLoader) object with default settings.
+pub fn icon_loader_hicolor() -> &'static IconLoader {
+    static LOADER: OnceLock<IconLoader> = OnceLock::new();
+
+    LOADER.get_or_init(|| IconLoader::new())
+}
