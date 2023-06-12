@@ -9,12 +9,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// Error type returned by this crate.
 #[derive(Debug)]
 pub enum Error {
-    /// No icon with the given name could be found.
-    IconNotFound {
-        /// The given icon name.
-        icon_name: String,
-    },
-
     /// No theme with the given name could be found.
     ThemeNotFound {
         /// The given theme name.
@@ -29,12 +23,6 @@ pub enum Error {
 }
 
 impl Error {
-    pub(crate) fn icon_not_found(icon_name: impl Into<String>) -> Self {
-        Error::IconNotFound {
-            icon_name: icon_name.into(),
-        }
-    }
-
     pub(crate) fn theme_not_found(theme_name: impl Into<String>) -> Self {
         Error::ThemeNotFound {
             theme_name: theme_name.into(),
@@ -54,9 +42,6 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::IconNotFound { icon_name } => {
-                write!(f, "Icon with name {} not found", icon_name)
-            }
             Error::ThemeNotFound { theme_name } => {
                 write!(f, "Theme with name {} not found", theme_name)
             }

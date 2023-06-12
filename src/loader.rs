@@ -1,4 +1,4 @@
-use std::{borrow::Cow, path::PathBuf, sync::Arc};
+use std::{borrow::Cow, ops::Deref, path::PathBuf};
 
 use crate::{
     error::{Error, Result},
@@ -16,8 +16,8 @@ use dashmap::DashMap;
 pub struct IconLoader {
     theme_name: String,
     fallback_theme_name: String,
-    theme_cache: DashMap<String, Arc<IconThemes>>,
-    icon_cache: DashMap<String, Option<Arc<Icon>>>,
+    theme_cache: DashMap<String, IconThemes>,
+    icon_cache: DashMap<String, Option<Icon>>,
     search_paths: SearchPaths,
     theme_name_provider: ThemeNameProvider,
 }
@@ -59,26 +59,22 @@ impl IconLoader {
 
     /// Loads the icon with the name `icon_name` from the current icon theme.
     /// If the icon cannot be found, it will be looked for in the fallback icon theme.
-    pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Result<Arc<Icon>> {
+    /// If it cannot be found in the fallback theme, `None` is returned.
+    pub fn load_icon<'a>(&'a self, icon_name: impl AsRef<str>) -> impl Deref<Target = Option<Icon>> + 'a {
         let icon_name = icon_name.as_ref();
 
-        if let Some(icon) = self.icon_cache.get(icon_name) {
-            return icon
-                .value()
-                .clone()
-                .ok_or_else(|| Error::icon_not_found(icon_name));
+        if !self.icon_cache.contains_key(icon_name) {
+            let mut searched_themes = Vec::new();
+
+            let icon = self
+                .find_icon(self.theme_name(), icon_name, &mut searched_themes)
+                .or_else(|| self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes));
+
+            self.icon_cache.insert(icon_name.into(), icon);
         }
 
-        let mut searched_themes = Vec::new();
-
-        let icon = self
-            .find_icon(self.theme_name(), icon_name, &mut searched_themes)
-            .or_else(|| self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes))
-            .map(Arc::from);
-
-        self.icon_cache.insert(icon_name.into(), icon.clone());
-
-        icon.ok_or_else(|| Error::icon_not_found(icon_name))
+        // Unwrapping is ok, since we just added a value
+        self.icon_cache.get(icon_name).unwrap()
     }
 
     /// Returns the currently used theme name.
@@ -174,8 +170,8 @@ impl IconLoader {
         self.theme_name_provider = theme_name_provider;
     }
 
-    /// Queries the set [`ThemeNameProvider`](crate::ThemeNameProvider) for the theme name to be used.
-    /// Returns an error, if the set [`ThemeNameProvider`](crate::ThemeNameProvider) returns an error or the theme with the returned name cannot be found.
+    /// Queries the set [`ThemeNameProvider`](ThemeNameProvider) for the theme name to be used.
+    /// Returns an error, if the set [`ThemeNameProvider`](ThemeNameProvider) returns an error or the theme with the returned name cannot be found.
     ///
     /// Set a theme name provider with [`IconLoader::set_theme_name_provider()`].
     pub fn update_theme_name(&mut self) -> Result<()> {
@@ -220,17 +216,16 @@ impl IconLoader {
         !self.load_themes(theme_name).is_empty()
     }
 
-    fn load_themes(&self, theme_name: &str) -> Arc<IconThemes> {
-        if let Some(theme) = self.theme_cache.get(theme_name) {
-            return theme.value().clone();
+    fn load_themes<'a>(&'a self, theme_name: &'a str) -> impl Deref<Target = IconThemes> + 'a {
+        if !self.theme_cache.contains_key(theme_name) {
+            let new_themes = IconThemes::find(theme_name, &self.search_paths());
+
+            self.theme_cache
+                .insert(theme_name.into(), new_themes);
         }
 
-        let new_themes = Arc::from(IconThemes::find(theme_name, &self.search_paths()));
-
-        self.theme_cache
-            .insert(theme_name.into(), new_themes.clone());
-
-        new_themes
+        // Unwrapping is ok, since we just added a value
+        self.theme_cache.get(theme_name).unwrap()
     }
 
     fn find_icon(

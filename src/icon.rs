@@ -81,11 +81,8 @@ impl Icon {
             return file;
         }
 
-        if size != 1 {
-            if let Some(file) = self.file_for_size_filtered(size * scale, |file| file.scale() == 1)
-            {
-                return file;
-            }
+        if let Some(file) = self.file_for_size_filtered(size * scale, |file| file.scale() == 1) {
+            return file;
         }
 
         // If we don't filter, there is always at least one file on disk.
@@ -100,7 +97,7 @@ impl Icon {
     /// # Arguments
     ///
     /// * `size` - The ideal size of the returned icon file.
-    /// * `filter` - A function that takes a reference to an [`IconFile`](crate::icon::IconFile) and returns true, if it passes the test and false otherwise.
+    /// * `filter` - A function that takes a reference to an [`IconFile`](icon::IconFile) and returns true, if it passes the test and false otherwise.
     ///
     /// # Example
     ///
