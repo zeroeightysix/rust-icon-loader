@@ -10,7 +10,7 @@ A crate that loads and caches themed icons in 100% safe rust.
 Just add it to your `cargo.toml` file like this:
 ```
 [dependencies]
-icon-loader = "0.3"
+icon-loader = "0.4"
 ```
 
 ## Cargo-Features
@@ -26,16 +26,24 @@ icon-loader = "0.3"
 
 ## Examples
 
+* Using a global [`IconLoader`](IconLoader) object to load icons from the systems `hicolor` icon theme:
+```rust
+use icon_loader::icon_loader_hicolor;
+
+if let Some(icon) = icon_loader_hicolor().load_icon("audio-headphones") {
+    let path = icon.file_for_size(64).path();
+}
+```
+
 * Loading icons from the default icon theme set in KDE:
 ```rust
-use icon_loader::{IconLoader, ThemeNameProvider};
+use icon_loader::IconLoader;
 
-let mut loader = IconLoader::new();
-loader.set_theme_name_provider(ThemeNameProvider::KDE);
-loader.update_theme_name().unwrap();
+let loader = IconLoader::new_kde().unwrap();
 
-let icon = loader.load_icon("audio-headphones").unwrap();
-let path = icon.file_for_size(64).path();
+if let Some(icon) = loader.load_icon("audio-headphones") {
+    let path = icon.file_for_size(64).path();
+}
 ```
 
 * Loading icons from a custom theme in a provided folder:
@@ -45,10 +53,11 @@ use icon_loader::IconLoader;
 let mut loader = IconLoader::new();
 loader.set_search_paths(&["path_to_your_icon_theme"]);
 loader.set_theme_name_provider("name_of_your_icon_theme");
-loader.update_theme_name().unwrap();
+loader.update_theme_name();
 
-let icon = loader.load_icon("icon_name").unwrap();
-let path = icon.file_for_size(32).path();
+if let Some(icon) = loader.load_icon("icon_name") {
+    let path = icon.file_for_size(32).path();
+}
 ```
 
 ## License
