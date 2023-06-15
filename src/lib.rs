@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! * Using a global [`IconLoader`](IconLoader) object to load icons from the systems `hicolor` icon theme:
-//! ```
+//! ```no_run
 //! use icon_loader::icon_loader_hicolor;
 //!
 //! if let Some(icon) = icon_loader_hicolor().load_icon("audio-headphones") {
@@ -13,7 +13,7 @@
 //! ```
 //!
 //! * Loading icons from the default icon theme set in KDE:
-//! ```
+//! ```no_run
 //! use icon_loader::IconLoader;
 //!
 //! let loader = IconLoader::new_kde().unwrap();
@@ -24,13 +24,13 @@
 //! ```
 //!
 //! * Loading icons from a custom theme in a provided folder:
-//! ```
+//! ```no_run
 //! use icon_loader::IconLoader;
 //!
 //! let mut loader = IconLoader::new();
 //! loader.set_search_paths(&["path_to_your_icon_theme"]);
 //! loader.set_theme_name_provider("name_of_your_icon_theme");
-//! loader.update_theme_name();
+//! loader.update_theme_name().unwrap();
 //!
 //! if let Some(icon) = loader.load_icon("icon_name") {
 //!     let path = icon.file_for_size(32).path();
