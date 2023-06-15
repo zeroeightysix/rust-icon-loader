@@ -3,11 +3,11 @@
 //!
 //! # Examples
 //!
-//! * Using a global [`IconLoader`](crate::IconLoader) object to load icons from the systems `hicolor` icon theme:
+//! * Using a global [`IconLoader`](IconLoader) object to load icons from the systems `hicolor` icon theme:
 //! ```
 //! use icon_loader::icon_loader_hicolor;
 //!
-//! if let Ok(icon) = icon_loader_hicolor().load_icon("audio-headphones") {
+//! if let Some(icon) = icon_loader_hicolor().load_icon("audio-headphones") {
 //!     let path = icon.file_for_size(64).path();
 //! }
 //! ```
@@ -18,7 +18,7 @@
 //!
 //! let loader = IconLoader::new_kde().unwrap();
 //!
-//! if let Ok(icon) = loader.load_icon("audio-headphones") {
+//! if let Some(icon) = loader.load_icon("audio-headphones") {
 //!     let path = icon.file_for_size(64).path();
 //! }
 //! ```
@@ -32,7 +32,7 @@
 //! loader.set_theme_name_provider("name_of_your_icon_theme");
 //! loader.update_theme_name();
 //!
-//! if let Ok(icon) = loader.load_icon("icon_name") {
+//! if let Some(icon) = loader.load_icon("icon_name") {
 //!     let path = icon.file_for_size(32).path();
 //! }
 //! ```
@@ -60,7 +60,7 @@ pub use theme_name_provider::ThemeNameProvider;
 
 use std::sync::OnceLock;
 
-/// This function returns a reference to a global [`IconLoader`](crate::IconLoader) object with default settings.
+/// This function returns a reference to a global [`IconLoader`](IconLoader) object with default settings.
 pub fn icon_loader_hicolor() -> &'static IconLoader {
     static LOADER: OnceLock<IconLoader> = OnceLock::new();
 

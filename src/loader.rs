@@ -1,4 +1,4 @@
-use std::{borrow::Cow, ops::Deref, path::PathBuf};
+use std::{borrow::Cow, ops::Deref, path::PathBuf, sync::Arc};
 
 use crate::{
     error::{Error, Result},
@@ -17,7 +17,7 @@ pub struct IconLoader {
     theme_name: String,
     fallback_theme_name: String,
     theme_cache: DashMap<String, IconThemes>,
-    icon_cache: DashMap<String, Option<Icon>>,
+    icon_cache: DashMap<String, Option<Arc<Icon>>>,
     search_paths: SearchPaths,
     theme_name_provider: ThemeNameProvider,
 }
@@ -60,7 +60,7 @@ impl IconLoader {
     /// Loads the icon with the name `icon_name` from the current icon theme.
     /// If the icon cannot be found, it will be looked for in the fallback icon theme.
     /// If it cannot be found in the fallback theme, `None` is returned.
-    pub fn load_icon<'a>(&'a self, icon_name: impl AsRef<str>) -> impl Deref<Target = Option<Icon>> + 'a {
+    pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Option<Arc<Icon>> {
         let icon_name = icon_name.as_ref();
 
         if !self.icon_cache.contains_key(icon_name) {
@@ -68,13 +68,16 @@ impl IconLoader {
 
             let icon = self
                 .find_icon(self.theme_name(), icon_name, &mut searched_themes)
-                .or_else(|| self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes));
+                .or_else(|| {
+                    self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes)
+                })
+                .map(Arc::new);
 
             self.icon_cache.insert(icon_name.into(), icon);
         }
 
         // Unwrapping is ok, since we just added a value
-        self.icon_cache.get(icon_name).unwrap()
+        self.icon_cache.get(icon_name).unwrap().value().clone()
     }
 
     /// Returns the currently used theme name.
@@ -220,8 +223,7 @@ impl IconLoader {
         if !self.theme_cache.contains_key(theme_name) {
             let new_themes = IconThemes::find(theme_name, &self.search_paths());
 
-            self.theme_cache
-                .insert(theme_name.into(), new_themes);
+            self.theme_cache.insert(theme_name.into(), new_themes);
         }
 
         // Unwrapping is ok, since we just added a value

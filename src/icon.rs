@@ -44,12 +44,13 @@ impl Icon {
     ///# Example
     ///
     /// ```
+    /// use std::ops::Deref;
     /// use icon_loader::IconLoader;
     ///
     /// let loader = IconLoader::new();
-    /// if let Ok(icon) = loader.load_icon("minimum") {
+    /// if let Some(icon) = loader.load_icon("minimum") {
     ///     let icon_file = icon.file_for_size(32);
-    /// }
+    /// };
     /// ```
     pub fn file_for_size(&self, size: u16) -> &IconFile {
         self.file_for_size_scaled(size, 1)
@@ -69,12 +70,13 @@ impl Icon {
     ///# Example
     ///
     /// ```
+    /// use std::ops::Deref;
     /// use icon_loader::IconLoader;
     ///
     /// let loader = IconLoader::new();
-    /// if let Ok(icon) = loader.load_icon("minimum") {
+    /// if let Some(icon) = loader.load_icon("minimum") {
     ///     let icon_file = icon.file_for_size_scaled(32, 2);
-    /// }
+    /// };
     /// ```
     pub fn file_for_size_scaled(&self, size: u16, scale: u16) -> &IconFile {
         if let Some(file) = self.file_for_size_filtered(size, |file| file.scale() == scale) {
@@ -102,12 +104,13 @@ impl Icon {
     /// # Example
     ///
     /// ```
+    /// use std::ops::Deref;
     /// use icon_loader::{IconLoader, IconFileType};
     ///
     /// let loader = IconLoader::new();
-    /// if let Ok(icon) = loader.load_icon("minimum") {
+    /// if let Some(icon) = loader.load_icon("minimum") {
     ///     let icon_file = icon.file_for_size_filtered(32, |file| file.icon_type() == IconFileType::PNG);
-    /// }
+    /// };
     /// ```
     pub fn file_for_size_filtered(
         &self,
