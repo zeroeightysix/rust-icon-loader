@@ -1,6 +1,6 @@
 [package]
 name = "icon-loader"
-version = "0.3.6"
+version = "0.4.0"
 authors = ["Malte Veerman <malte.veerman@gmail.com>"]
 license = "MIT"
 edition = "2018"
