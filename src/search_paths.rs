@@ -3,9 +3,10 @@ use std::{borrow::Cow, path::PathBuf};
 use xdg::BaseDirectories;
 
 /// Enum that provides a list of directories to [`IconLoader`](crate::IconLoader) to search for icons in.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum SearchPaths {
     /// Uses the `xdg` crate for system icon paths.
+    #[default]
     System,
 
     /// A custom set of paths.
@@ -30,12 +31,6 @@ impl SearchPaths {
             )),
             SearchPaths::Custom(dirs) => Cow::Borrowed(dirs),
         }
-    }
-}
-
-impl Default for SearchPaths {
-    fn default() -> Self {
-        SearchPaths::System
     }
 }
 

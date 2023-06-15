@@ -24,7 +24,7 @@ impl IconTheme {
         }
 
         let mut theme = Self {
-            content_dir: content_dir,
+            content_dir,
             key_list: Vec::new(),
         };
 
@@ -73,8 +73,8 @@ impl IconTheme {
             for icon_type in IconFileType::types() {
                 let icon_path = self
                     .content_dir
-                    .join(&icon_dir_info.path())
-                    .join(&icon_name)
+                    .join(icon_dir_info.path())
+                    .join(icon_name)
                     .with_extension(icon_type.as_ref());
 
                 if icon_path.exists() {
@@ -135,8 +135,7 @@ impl IconThemes {
         let entries: Vec<IconFile> = self
             .themes
             .iter()
-            .map(|theme| theme.entries(icon_name))
-            .flatten()
+            .flat_map(|theme| theme.entries(icon_name))
             .collect();
 
         if entries.is_empty() {
