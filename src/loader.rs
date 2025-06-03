@@ -2,7 +2,7 @@ use std::{borrow::Cow, ops::Deref, path::PathBuf, sync::Arc};
 
 use crate::{
     error::{Error, Result},
-    icon::{Icon, IconThemes},
+    icon::{Icon, IconThemeChain},
     search_paths::SearchPaths,
     theme_name_provider::ThemeNameProvider,
 };
@@ -16,7 +16,7 @@ use dashmap::DashMap;
 pub struct IconLoader {
     theme_name: String,
     fallback_theme_name: String,
-    theme_cache: DashMap<String, IconThemes>,
+    theme_cache: DashMap<String, IconThemeChain>,
     icon_cache: DashMap<String, Option<Arc<Icon>>>,
     search_paths: SearchPaths,
     theme_name_provider: ThemeNameProvider,
@@ -219,9 +219,9 @@ impl IconLoader {
         !self.load_themes(theme_name).is_empty()
     }
 
-    fn load_themes<'a>(&'a self, theme_name: &'a str) -> impl Deref<Target = IconThemes> + 'a {
+    fn load_themes<'a>(&'a self, theme_name: &'a str) -> impl Deref<Target =IconThemeChain> + 'a {
         if !self.theme_cache.contains_key(theme_name) {
-            let new_themes = IconThemes::find(theme_name, &self.search_paths());
+            let new_themes = IconThemeChain::find(theme_name, &self.search_paths());
 
             self.theme_cache.insert(theme_name.into(), new_themes);
         }

@@ -6,7 +6,7 @@ pub use icon_dir::{IconDir, IconSizeType};
 pub use icon_file::{IconFile, IconFileType};
 pub use icon_theme::error::{Error, Result};
 
-pub(crate) use icon_theme::IconThemes;
+pub(crate) use icon_theme::IconThemeChain;
 
 /// Struct containing information about a themed icon.
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]

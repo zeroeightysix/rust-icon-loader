@@ -88,15 +88,15 @@ impl IconTheme {
 }
 
 #[derive(Debug)]
-pub(crate) struct IconThemes {
+pub(crate) struct IconThemeChain {
     name: String,
     themes: Vec<IconTheme>,
     parents: Vec<String>,
 }
 
-impl IconThemes {
-    pub(crate) fn find(theme_name: &str, search_paths: &[PathBuf]) -> IconThemes {
-        let mut themes = IconThemes {
+impl IconThemeChain {
+    pub(crate) fn find(theme_name: &str, search_paths: &[PathBuf]) -> IconThemeChain {
+        let mut themes = IconThemeChain {
             name: theme_name.to_string(),
             themes: Vec::new(),
             parents: Vec::new(),
