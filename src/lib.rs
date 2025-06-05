@@ -48,6 +48,7 @@ mod icon;
 mod loader;
 mod search_paths;
 mod theme_name_provider;
+mod test;
 
 pub use error::{Error, ProviderError, Result};
 pub use icon::{Icon, IconDir, IconFile, IconFileType, IconSizeType};
