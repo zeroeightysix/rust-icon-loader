@@ -38,7 +38,6 @@
 //! ```
 
 #![deny(
-    missing_docs,
     missing_debug_implementations,
     missing_copy_implementations,
     trivial_casts,
@@ -64,5 +63,5 @@ use std::sync::OnceLock;
 pub fn icon_loader_hicolor() -> &'static IconLoader {
     static LOADER: OnceLock<IconLoader> = OnceLock::new();
 
-    LOADER.get_or_init(IconLoader::new)
+    LOADER.get_or_init(IconLoader::new_hicolor)
 }

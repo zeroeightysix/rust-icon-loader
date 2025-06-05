@@ -1,7 +1,7 @@
 use std::{borrow::Cow, ops::Deref, path::PathBuf};
 
 use crate::{
-    error::{Error, Result},
+    error::Result,
     icon::{Icon, IconThemeChain},
     search_paths::SearchPaths,
     theme_name_provider::ThemeNameProvider,
@@ -18,41 +18,41 @@ pub struct IconLoader {
     fallback_theme_name: String,
     theme_cache: DashMap<String, IconThemeChain>,
     search_paths: SearchPaths,
-    theme_name_provider: ThemeNameProvider,
 }
 
 impl IconLoader {
-    /// Creates a new `IconLoader` with default settings.
-    pub fn new() -> Self {
+    pub fn new(theme_name: impl Into<String>, fallback_theme_name: impl Into<String>) -> Self {
         IconLoader {
-            theme_name: String::from("hicolor"),
-            fallback_theme_name: String::from("hicolor"),
-            theme_name_provider: Default::default(),
+            theme_name: theme_name.into(),
+            fallback_theme_name: fallback_theme_name.into(),
             theme_cache: Default::default(),
             search_paths: Default::default(),
         }
+    }
+
+    /// Creates a new `IconLoader` with default settings.
+    pub fn new_hicolor() -> Self {
+        Self::new("hicolor", "hicolor")
+    }
+    
+    pub fn new_from_provider(theme_name_provider: ThemeNameProvider) -> Result<Self> {
+        let theme_name = theme_name_provider.theme_name()?;
+
+        Ok(Self::new(&theme_name, &theme_name))
     }
 
     /// Creates a new KDE `IconLoader`.
     /// This is a convenience function.
     #[cfg(feature = "kde")]
     pub fn new_kde() -> Result<Self> {
-        let mut loader = Self::new();
-        loader.set_theme_name_provider(ThemeNameProvider::KDE);
-        loader.update_theme_name()?;
-
-        Ok(loader)
+        Self::new_from_provider(ThemeNameProvider::KDE)
     }
 
     /// Creates a new GTK `IconLoader`.
     /// This is a convenience function.
     #[cfg(feature = "gtk")]
     pub fn new_gtk() -> Result<Self> {
-        let mut loader = Self::new();
-        loader.set_theme_name_provider(ThemeNameProvider::GTK);
-        loader.update_theme_name()?;
-
-        Ok(loader)
+        Self::new_from_provider(ThemeNameProvider::GTK)
     }
 
     /// Loads the icon with the name `icon_name` from the current icon theme.
@@ -88,99 +88,6 @@ impl IconLoader {
     /// Returns the paths that are searched for icon themes.
     pub fn search_paths(&self) -> Cow<[PathBuf]> {
         self.search_paths.paths()
-    }
-
-    /// Sets the paths where to search for icon themes.
-    ///
-    /// # Arguments
-    ///
-    /// * `search_paths` - The paths where to look for icon themes.
-    /// Anything that implements `IntoIterator<Item = Into<PathBuf>>` can be used.
-    ///
-    /// # Examples
-    ///
-    /// Custom search paths:
-    /// ```
-    /// use icon_loader::IconLoader;
-    ///
-    /// let mut loader = IconLoader::new();
-    /// loader.set_search_paths(&["/path/to/icon/themes", "/other/path/to/icon/themes"]);
-    /// ```
-    ///
-    /// System search paths:
-    /// ```
-    /// use icon_loader::{IconLoader, SearchPaths};
-    ///
-    /// let mut loader = IconLoader::new();
-    /// loader.set_search_paths(SearchPaths::System);
-    /// ```
-    ///
-    /// By default these are the system icon paths.
-    pub fn set_search_paths(&mut self, search_paths: impl Into<SearchPaths>) {
-        let search_paths = search_paths.into();
-
-        if self.search_paths == search_paths {
-            return;
-        }
-
-        self.search_paths = search_paths;
-        self.theme_cache.clear();
-    }
-
-    /// Sets the way in which the used theme name is determined.
-    ///
-    /// # Arguments
-    ///
-    /// * `theme_name_provider` - The provider of the default icon theme name.
-    /// Anything that implements `Into<ThemeNameProvider>` can be used.
-    ///
-    /// # Examples
-    ///
-    /// User defined theme name:
-    /// ```
-    /// use icon_loader::IconLoader;
-    ///
-    /// let mut loader = IconLoader::new();
-    /// loader.set_theme_name_provider("theme_name");
-    /// ```
-    ///
-    /// KDE system theme:
-    /// ```
-    /// use icon_loader::{IconLoader, ThemeNameProvider};
-    ///
-    /// let mut loader = IconLoader::new();
-    /// loader.set_theme_name_provider(ThemeNameProvider::KDE);
-    /// ```
-    ///
-    /// [`IconLoader::update_theme_name()`] needs to be called after setting a new theme name provider.
-    pub fn set_theme_name_provider(&mut self, theme_name_provider: impl Into<ThemeNameProvider>) {
-        let theme_name_provider = theme_name_provider.into();
-
-        if self.theme_name_provider == theme_name_provider {
-            return;
-        }
-
-        self.theme_name_provider = theme_name_provider;
-    }
-
-    /// Queries the set [`ThemeNameProvider`](ThemeNameProvider) for the theme name to be used.
-    /// Returns an error, if the set [`ThemeNameProvider`](ThemeNameProvider) returns an error or the theme with the returned name cannot be found.
-    ///
-    /// Set a theme name provider with [`IconLoader::set_theme_name_provider()`].
-    pub fn update_theme_name(&mut self) -> Result<()> {
-        let theme_name = self.theme_name_provider.theme_name()?;
-
-        if self.theme_name == theme_name {
-            return Ok(());
-        }
-
-        if self.theme_exists(&theme_name) {
-            self.theme_name = theme_name;
-
-            Ok(())
-        } else {
-            Err(Error::theme_not_found(theme_name))
-        }
     }
 
     /// Sets a new fallback theme name. If an icon cannot be found in the set theme,
@@ -250,6 +157,6 @@ impl IconLoader {
 
 impl Default for IconLoader {
     fn default() -> Self {
-        IconLoader::new()
+        IconLoader::new_hicolor()
     }
 }
