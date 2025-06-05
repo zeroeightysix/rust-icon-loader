@@ -63,7 +63,11 @@ impl IconTheme {
         Ok(theme)
     }
 
-    fn entries(&self, icon_name: &str) -> Vec<IconFile> {
+    pub fn dirs(&self) -> &[Arc<IconDir>] {
+        &self.key_list
+    }
+    
+    pub fn entries(&self, icon_name: &str) -> Vec<IconFile> {
         if icon_name.is_empty() {
             return Vec::new();
         }
@@ -154,6 +158,10 @@ impl IconThemeChain {
     
     pub fn name(&self) -> &str {
         self.name.as_str()
+    }
+    
+    pub fn themes(&self) -> &[IconTheme] {
+        &self.themes
     }
 
     pub fn parents(&self) -> impl Iterator<Item = Arc<IconThemeChain>> + use<'_> {
