@@ -5,7 +5,7 @@ mod test {
     #[test]
     fn test_find_firefox_icon() {
         let loader = IconLoader::new_hicolor();
-
+        
         let icon = loader.load_icon("firefox").unwrap();
         let icon = icon.file_for_size_scaled(32, 1);
 

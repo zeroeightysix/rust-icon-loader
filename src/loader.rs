@@ -83,6 +83,10 @@ impl IconLoader {
     pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Option<Icon> {
         self.find_icon(self.theme_name(), icon_name.as_ref())
     }
+    
+    pub fn themes(&self) -> Arc<ThemeCache> {
+        self.theme_cache.clone()
+    }
 
     /// Returns the currently used theme name.
     ///
