@@ -5,10 +5,11 @@ pub use error::{Error, Result};
 use super::{Icon, IconDir, IconFile, IconFileType};
 
 use std::{path::PathBuf, sync::Arc};
+use crate::ThemeCache;
 
 #[derive(Debug)]
-pub(crate) struct IconTheme {
-    content_dir: PathBuf,
+pub struct IconTheme {
+    pub content_dir: PathBuf,
     key_list: Vec<Arc<IconDir>>,
 }
 
@@ -88,18 +89,20 @@ impl IconTheme {
 }
 
 #[derive(Debug)]
-pub(crate) struct IconThemeChain {
-    name: String,
-    themes: Vec<IconTheme>,
-    parents: Vec<String>,
+pub struct IconThemeChain {
+    pub(crate) name: String,
+    pub(crate) themes: Vec<IconTheme>,
+    pub(crate) parents: Vec<String>,
+    pub(crate) cache: Arc<ThemeCache>,
 }
 
 impl IconThemeChain {
-    pub(crate) fn find(theme_name: &str, search_paths: &[PathBuf]) -> IconThemeChain {
+    pub(crate) fn find(cache: Arc<ThemeCache>, theme_name: &str, search_paths: &[PathBuf]) -> IconThemeChain {
         let mut themes = IconThemeChain {
             name: theme_name.to_string(),
             themes: Vec::new(),
             parents: Vec::new(),
+            cache
         };
 
         for search_path in search_paths {
@@ -148,8 +151,13 @@ impl IconThemeChain {
     pub(crate) fn is_empty(&self) -> bool {
         self.themes.is_empty()
     }
+    
+    pub fn name(&self) -> &str {
+        self.name.as_str()
+    }
 
-    pub(crate) fn parents(&self) -> &[String] {
-        &self.parents
+    pub fn parents(&self) -> impl Iterator<Item = Arc<IconThemeChain>> + use<'_> {
+        self.parents.iter()
+            .map(move |parent| self.cache.theme(parent.as_str()).clone())
     }
 }

@@ -25,12 +25,10 @@
 //!
 //! * Loading icons from a custom theme in a provided folder:
 //! ```no_run
-//! use icon_loader::IconLoader;
+//! use icon_loader::{IconLoader, ThemeNameProvider};
 //!
-//! let mut loader = IconLoader::new();
-//! loader.set_search_paths(&["path_to_your_icon_theme"]);
-//! loader.set_theme_name_provider("name_of_your_icon_theme");
-//! loader.update_theme_name().unwrap();
+//! let mut loader = IconLoader::new_from_provider(ThemeNameProvider::User("my-theme".into()))
+//!     .unwrap();
 //!
 //! if let Some(icon) = loader.load_icon("icon_name") {
 //!     let path = icon.file_for_size(32).path();

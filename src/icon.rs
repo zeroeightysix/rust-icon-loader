@@ -1,6 +1,6 @@
 mod icon_dir;
 mod icon_file;
-mod icon_theme;
+pub mod icon_theme;
 
 pub use icon_dir::{IconDir, IconSizeType};
 pub use icon_file::{IconFile, IconFileType};
@@ -46,7 +46,7 @@ impl Icon {
     /// use std::ops::Deref;
     /// use icon_loader::IconLoader;
     ///
-    /// let loader = IconLoader::new();
+    /// let loader = IconLoader::new_hicolor();
     /// if let Some(icon) = loader.load_icon("minimum") {
     ///     let icon_file = icon.file_for_size(32);
     /// };
@@ -72,7 +72,7 @@ impl Icon {
     /// use std::ops::Deref;
     /// use icon_loader::IconLoader;
     ///
-    /// let loader = IconLoader::new();
+    /// let loader = IconLoader::new_hicolor();
     /// if let Some(icon) = loader.load_icon("minimum") {
     ///     let icon_file = icon.file_for_size_scaled(32, 2);
     /// };
@@ -106,7 +106,7 @@ impl Icon {
     /// use std::ops::Deref;
     /// use icon_loader::{IconLoader, IconFileType};
     ///
-    /// let loader = IconLoader::new();
+    /// let loader = IconLoader::new_hicolor();
     /// if let Some(icon) = loader.load_icon("minimum") {
     ///     let icon_file = icon.file_for_size_filtered(32, |file| file.icon_type() == IconFileType::PNG);
     /// };

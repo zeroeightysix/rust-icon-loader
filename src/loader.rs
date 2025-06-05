@@ -1,13 +1,13 @@
-use std::{borrow::Cow, ops::Deref, path::PathBuf};
-
 use crate::{
     error::Result,
     icon::{Icon, IconThemeChain},
     search_paths::SearchPaths,
     theme_name_provider::ThemeNameProvider,
 };
-
 use dashmap::DashMap;
+use std::collections::VecDeque;
+use std::sync::Arc;
+use std::{borrow::Cow, path::PathBuf};
 
 /// The central icon loader struct.
 ///
@@ -16,8 +16,31 @@ use dashmap::DashMap;
 pub struct IconLoader {
     theme_name: String,
     fallback_theme_name: String,
-    theme_cache: DashMap<String, IconThemeChain>,
+    theme_cache: Arc<ThemeCache>,
+}
+
+#[derive(Debug, Default)]
+pub struct ThemeCache {
+    cache: DashMap<String, Arc<IconThemeChain>>,
     search_paths: SearchPaths,
+}
+
+impl ThemeCache {
+    /// Returns the paths that are searched for icon themes.
+    pub fn search_paths(&self) -> Cow<[PathBuf]> {
+        self.search_paths.paths()
+    }
+
+    pub fn theme<'a>(self: &'a Arc<Self>, theme_name: &'a str) -> Arc<IconThemeChain> {
+        if !self.cache.contains_key(theme_name) {
+            let new_themes = IconThemeChain::find(self.clone(), theme_name, &self.search_paths());
+
+            self.cache.insert(theme_name.into(), Arc::new(new_themes));
+        }
+
+        // Unwrapping is ok, since we just added a value
+        self.cache.get(theme_name).unwrap().clone()
+    }
 }
 
 impl IconLoader {
@@ -26,7 +49,6 @@ impl IconLoader {
             theme_name: theme_name.into(),
             fallback_theme_name: fallback_theme_name.into(),
             theme_cache: Default::default(),
-            search_paths: Default::default(),
         }
     }
 
@@ -34,7 +56,7 @@ impl IconLoader {
     pub fn new_hicolor() -> Self {
         Self::new("hicolor", "hicolor")
     }
-    
+
     pub fn new_from_provider(theme_name_provider: ThemeNameProvider) -> Result<Self> {
         let theme_name = theme_name_provider.theme_name()?;
 
@@ -59,16 +81,7 @@ impl IconLoader {
     /// If the icon cannot be found, it will be looked for in the fallback icon theme.
     /// If it cannot be found in the fallback theme, `None` is returned.
     pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Option<Icon> {
-        let icon_name = icon_name.as_ref();
-
-        let mut searched_themes = Vec::new();
-        let icon = self
-            .find_icon(self.theme_name(), icon_name, &mut searched_themes)
-            .or_else(|| {
-                self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes)
-            });
-
-        icon
+        self.find_icon(self.theme_name(), icon_name.as_ref())
     }
 
     /// Returns the currently used theme name.
@@ -87,7 +100,7 @@ impl IconLoader {
 
     /// Returns the paths that are searched for icon themes.
     pub fn search_paths(&self) -> Cow<[PathBuf]> {
-        self.search_paths.paths()
+        self.theme_cache.search_paths()
     }
 
     /// Sets a new fallback theme name. If an icon cannot be found in the set theme,
@@ -111,44 +124,33 @@ impl IconLoader {
             return false;
         }
 
-        !self.load_themes(theme_name).is_empty()
+        !self.theme_cache.theme(theme_name).is_empty()
     }
 
-    fn load_themes<'a>(&'a self, theme_name: &'a str) -> impl Deref<Target =IconThemeChain> + 'a {
-        if !self.theme_cache.contains_key(theme_name) {
-            let new_themes = IconThemeChain::find(theme_name, &self.search_paths());
-
-            self.theme_cache.insert(theme_name.into(), new_themes);
-        }
-
-        // Unwrapping is ok, since we just added a value
-        self.theme_cache.get(theme_name).unwrap()
-    }
-
-    fn find_icon(
-        &self,
-        theme_name: &str,
-        icon_name: &str,
-        searched_themes: &mut Vec<String>,
-    ) -> Option<Icon> {
+    fn find_icon(&self, theme_name: &str, icon_name: &str) -> Option<Icon> {
         if theme_name.is_empty() || icon_name.is_empty() {
             return None;
         }
 
-        searched_themes.push(theme_name.into());
+        let mut searched_themes = vec![];
 
-        let themes = self.load_themes(theme_name);
+        let themes = self.theme_cache.theme(theme_name);
+        let fallback_themes = self.theme_cache.theme(&self.fallback_theme_name);
+        let mut themes = VecDeque::from([themes, fallback_themes]);
 
-        if let Some(icon) = themes.find_icon(icon_name) {
-            return Some(icon);
-        }
-
-        for parent in themes.parents() {
-            if !searched_themes.contains(parent) {
-                if let Some(icon) = self.find_icon(parent, icon_name, searched_themes) {
-                    return Some(icon);
-                }
+        while let Some(theme) = themes.pop_front() {
+            let theme_name = theme.name().to_string();
+            if searched_themes.contains(&theme_name) {
+                continue;
             }
+
+            theme.parents().for_each(|theme| themes.push_front(theme));
+
+            if let Some(icon) = theme.find_icon(icon_name) {
+                return Some(icon);
+            }
+
+            searched_themes.push(theme_name);
         }
 
         None
