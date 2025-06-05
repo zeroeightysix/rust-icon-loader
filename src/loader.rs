@@ -1,4 +1,4 @@
-use std::{borrow::Cow, ops::Deref, path::PathBuf, sync::Arc};
+use std::{borrow::Cow, ops::Deref, path::PathBuf};
 
 use crate::{
     error::{Error, Result},
@@ -11,13 +11,12 @@ use dashmap::DashMap;
 
 /// The central icon loader struct.
 ///
-/// It lets you load and cache named theme icons from system themes as well as custom themes.
+/// It lets you load named theme icons from system themes as well as custom themes.
 #[derive(Debug)]
 pub struct IconLoader {
     theme_name: String,
     fallback_theme_name: String,
     theme_cache: DashMap<String, IconThemeChain>,
-    icon_cache: DashMap<String, Option<Arc<Icon>>>,
     search_paths: SearchPaths,
     theme_name_provider: ThemeNameProvider,
 }
@@ -30,7 +29,6 @@ impl IconLoader {
             fallback_theme_name: String::from("hicolor"),
             theme_name_provider: Default::default(),
             theme_cache: Default::default(),
-            icon_cache: Default::default(),
             search_paths: Default::default(),
         }
     }
@@ -60,24 +58,17 @@ impl IconLoader {
     /// Loads the icon with the name `icon_name` from the current icon theme.
     /// If the icon cannot be found, it will be looked for in the fallback icon theme.
     /// If it cannot be found in the fallback theme, `None` is returned.
-    pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Option<Arc<Icon>> {
+    pub fn load_icon(&self, icon_name: impl AsRef<str>) -> Option<Icon> {
         let icon_name = icon_name.as_ref();
 
-        if !self.icon_cache.contains_key(icon_name) {
-            let mut searched_themes = Vec::new();
+        let mut searched_themes = Vec::new();
+        let icon = self
+            .find_icon(self.theme_name(), icon_name, &mut searched_themes)
+            .or_else(|| {
+                self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes)
+            });
 
-            let icon = self
-                .find_icon(self.theme_name(), icon_name, &mut searched_themes)
-                .or_else(|| {
-                    self.find_icon(self.fallback_theme_name(), icon_name, &mut searched_themes)
-                })
-                .map(Arc::new);
-
-            self.icon_cache.insert(icon_name.into(), icon);
-        }
-
-        // Unwrapping is ok, since we just added a value
-        self.icon_cache.get(icon_name).unwrap().value().clone()
+        icon
     }
 
     /// Returns the currently used theme name.
@@ -134,7 +125,6 @@ impl IconLoader {
 
         self.search_paths = search_paths;
         self.theme_cache.clear();
-        self.icon_cache.clear();
     }
 
     /// Sets the way in which the used theme name is determined.
@@ -186,7 +176,6 @@ impl IconLoader {
 
         if self.theme_exists(&theme_name) {
             self.theme_name = theme_name;
-            self.icon_cache.clear();
 
             Ok(())
         } else {
@@ -205,7 +194,6 @@ impl IconLoader {
         }
 
         self.fallback_theme_name = fallback_theme_name;
-        self.icon_cache.clear();
     }
 
     /// Returns whether a theme with the name `theme_name` exists in the current search paths.
